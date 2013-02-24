@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
                  'Peter Steinberger' => 'me@petersteinberger.com',
                  'Hwee-Boon Yar' => 'hboon@motionobj.com' }
 
-  s.source = { :git => 'https://github.com/jverkoey/nimbus.git', :tag => '1.0.0' }
+  s.source = { :git => 'https://github.com/yakubbaev/nimbus.git', :tag => '1.0.0' }
 
   s.description = 'Nimbus is an iOS framework whose feature set grows only as fast as its documentation. ' \
                   'By focusing on documentation first and features second, Nimbus hopes to be a framework ' \
