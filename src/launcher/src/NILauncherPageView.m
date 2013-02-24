@@ -52,31 +52,57 @@
 - (void)layoutSubviews {
   [super layoutSubviews];
 
-  const CGFloat leftEdge = self.contentInset.left;
-  const CGFloat topEdge = self.contentInset.top;
-  const CGFloat rightEdge = self.bounds.size.width - self.contentInset.right;
-  const CGSize viewSize = self.viewSize;
-  const CGSize viewMargins = self.viewMargins;
-
-  CGFloat contentWidth = (self.bounds.size.width - self.contentInset.left - self.contentInset.right);
-  NSInteger numberOfColumns = floorf((contentWidth + viewMargins.width) / (viewSize.width + viewMargins.width));
-  CGFloat viewWidth = numberOfColumns * viewSize.width;
-  CGFloat distributedHorizontalMargin = floorf((contentWidth - viewWidth) / (CGFloat)(numberOfColumns + 1));
-  
-  const CGFloat horizontalDelta = viewSize.width + distributedHorizontalMargin;
-  const CGFloat verticalDelta = viewSize.height + viewMargins.height;
-
-  CGFloat x = leftEdge + distributedHorizontalMargin;
-  CGFloat y = topEdge;
-
-  for (UIView* view in self.mutableRecyclableViews) {
-    view.frame = CGRectMake(x, y, viewSize.width, viewSize.height);
-    x += horizontalDelta;
-    if (x + viewSize.width > rightEdge) {
-      x = leftEdge + distributedHorizontalMargin;
-      y += verticalDelta;
+    //  const CGFloat leftEdge = self.contentInset.left;
+    //  const CGFloat topEdge = self.contentInset.top;
+    //  const CGFloat rightEdge = self.bounds.size.width - self.contentInset.right;
+    //  const CGSize viewSize = self.viewSize;
+    //  const CGSize viewMargins = self.viewMargins;
+    //
+    //  CGFloat contentWidth = (self.bounds.size.width - self.contentInset.left - self.contentInset.right);
+    //  NSInteger numberOfColumns = floorf((contentWidth + viewMargins.width) / (viewSize.width + viewMargins.width));
+    //  CGFloat viewWidth = numberOfColumns * viewSize.width;
+    //  CGFloat distributedHorizontalMargin = floorf((contentWidth - viewWidth) / (CGFloat)(numberOfColumns + 1));
+    //
+    //  const CGFloat horizontalDelta = viewSize.width + distributedHorizontalMargin;
+    //  const CGFloat verticalDelta = viewSize.height + viewMargins.height;
+    //
+    //  CGFloat x = leftEdge + distributedHorizontalMargin;
+    //  CGFloat y = topEdge;
+    //
+    //  for (UIView* view in self.mutableRecyclableViews) {
+    //    view.frame = CGRectMake(x, y, viewSize.width, viewSize.height);
+    //    x += horizontalDelta;
+    //    if (x + viewSize.width > rightEdge) {
+    //      x = leftEdge + distributedHorizontalMargin;
+    //      y += verticalDelta;
+    //    }
+    //  }
+    
+    const CGFloat leftEdge = self.contentInset.left;
+    const CGFloat topEdge = self.contentInset.top;
+    const CGFloat bottomEdge = self.bounds.size.height - self.contentInset.bottom;
+    const CGSize viewSize = self.viewSize;
+    const CGSize viewMargins = self.viewMargins;
+    
+    CGFloat contentHeight = (self.bounds.size.height - self.contentInset.top - self.contentInset.bottom);
+    NSInteger numberOfRows = floorf((contentHeight + viewMargins.height) / (viewSize.height + viewMargins.height));
+    CGFloat viewHeight = numberOfRows * viewSize.height;
+    CGFloat distributedVerticalMargin = floorf((contentHeight - viewHeight) / (CGFloat)(numberOfRows + 1));
+    
+    const CGFloat horizontalDelta = viewSize.width + viewMargins.width;
+    const CGFloat verticalDelta = viewSize.height + distributedVerticalMargin;
+    
+    CGFloat x = leftEdge;
+    CGFloat y = topEdge + distributedVerticalMargin;
+    
+    for (UIView* view in self.mutableRecyclableViews) {
+        view.frame = CGRectMake(x, y, viewSize.width, viewSize.height);
+        y += verticalDelta;
+        if (y + viewSize.height > bottomEdge) {
+            x += horizontalDelta;
+            y = topEdge + distributedVerticalMargin;
+        }
     }
-  }
 }
 
 
