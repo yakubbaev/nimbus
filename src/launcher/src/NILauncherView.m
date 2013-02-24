@@ -21,6 +21,7 @@
 #import "NILauncherPageView.h"
 #import "NimbusPagingScrollView.h"
 #import "NimbusCore.h"
+#import "SMPageControl.h"
 
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "Nimbus requires ARC support."
@@ -37,7 +38,7 @@ static const NSTimeInterval kAnimateToPageDuration = 0.2;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @interface NILauncherView() <NIPagingScrollViewDataSource, NIPagingScrollViewDelegate>
 @property (nonatomic, readwrite, NI_STRONG) NIPagingScrollView* pagingScrollView;
-@property (nonatomic, readwrite, NI_STRONG) UIPageControl* pager;
+@property (nonatomic, readwrite, NI_STRONG) SMPageControl* pager;
 @property (nonatomic, readwrite, assign) NSInteger numberOfPages;
 @property (nonatomic, readwrite, NI_STRONG) NIViewRecycler* viewRecycler;
 - (void)updateLayoutForPage:(NILauncherPageView *)page;
@@ -83,29 +84,34 @@ static const NSTimeInterval kAnimateToPageDuration = 0.2;
 
   [self addSubview:_pagingScrollView];
 
-  // The pager displayed below the paging scroll view.
-  _pager = [[UIPageControl alloc] init];
-  _pager.hidesForSinglePage = YES;
+    // The pager displayed below the paging scroll view.
+    _pager = [[SMPageControl alloc] init];
+    _pager.numberOfPages = 0;
+    _pager.hidesForSinglePage = YES;
+    _pager.pageIndicatorImage = [UIImage imageNamed: @"page_dot.png"];
+    _pager.currentPageIndicatorImage = [UIImage imageNamed: @"current_page_dot.png"];
+    _pager.indicatorMargin = 5;
+    [_pager sizeToFit];
 
-  // So, this is weird. Apparently if you don't set a background color on the pager control
-  // then taps won't be handled anywhere but within the dot area. If you do set a background
-  // color, however, then taps outside of the dot area DO change the selected page.
-  //                                  \(o.o)/
-  _pager.backgroundColor = [UIColor blackColor];
+    // So, this is weird. Apparently if you don't set a background color on the pager control
+    // then taps won't be handled anywhere but within the dot area. If you do set a background
+    // color, however, then taps outside of the dot area DO change the selected page.
+    //                                  \(o.o)/
+    //    _pager.backgroundColor = [UIColor blackColor];
 
-  // Similarly for the scroll view anywhere there isn't a subview.
-  // We update these background colors when the launcher view's own background color is set.
-  _pagingScrollView.backgroundColor = [UIColor blackColor];
+    // Similarly for the scroll view anywhere there isn't a subview.
+    // We update these background colors when the launcher view's own background color is set.
+    _pagingScrollView.backgroundColor = [UIColor blackColor];
 
-  // Don't update the pager when the user taps until we've animated to the new page.
-  // This allows us to reset the page index forcefully if necessary without flickering the
-  // pager's current selection.
-  _pager.defersCurrentPageDisplay = YES;
+    // Don't update the pager when the user taps until we've animated to the new page.
+    // This allows us to reset the page index forcefully if necessary without flickering the
+    // pager's current selection.
+    //    _pager.defersCurrentPageDisplay = YES;
 
-  // When the user taps the pager control it fires a UIControlEventValueChanged notification.
-  [_pager addTarget:self action:@selector(pagerDidChangePage:) forControlEvents:UIControlEventValueChanged];
-
-  [self addSubview:_pager];
+    // When the user taps the pager control it fires a UIControlEventValueChanged notification.
+    [_pager addTarget:self action:@selector(pagerDidChangePage:) forControlEvents:UIControlEventValueChanged];
+    
+    [self addSubview:_pager];
 }
 
 
@@ -131,13 +137,15 @@ static const NSTimeInterval kAnimateToPageDuration = 0.2;
 - (void)layoutSubviews {
   [super layoutSubviews];
 
-  [_pager sizeToFit];
-  _pagingScrollView.frame = NIRectContract(self.bounds, 0, _pager.frame.size.height);
-  _pager.frame = NIRectShift(self.bounds, 0, _pagingScrollView.frame.size.height);
-
-  for (NILauncherPageView* pageView in self.pagingScrollView.visiblePages) {
-    [self updateLayoutForPage:pageView];
-  }
+    _pagingScrollView.frame = NIRectContract(self.bounds, 0, 0);
+    CGSize sz = [_pager sizeForNumberOfPages: _pager.numberOfPages];
+#define OFFSET_Y  17
+//    self.pager.frame = CGRectMake(0, _pagingScrollView.frame.size.height - OFFSET_Y, sz.width, sz.height);
+    self.pager.frame = CGRectMake(0, _pagingScrollView.frame.size.height - OFFSET_Y, 320, sz.height);
+    
+    for (NILauncherPageView* pageView in self.pagingScrollView.visiblePages) {
+        [self updateLayoutForPage:pageView];
+    }
 }
 
 
